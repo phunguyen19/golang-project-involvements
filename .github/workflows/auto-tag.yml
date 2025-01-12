@@ -1,5 +1,9 @@
 name: Auto Tag on PR Merge
 
+# Set permissions for the GITHUB_TOKEN
+permissions:
+  contents: write
+
 on:
   pull_request:
     types: [closed]
@@ -116,6 +120,8 @@ jobs:
 
       # 7. Create and push the new tag
       - name: Create and push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           new_tag=${{ steps.next_version.outputs.new_tag }}
           git tag $new_tag
