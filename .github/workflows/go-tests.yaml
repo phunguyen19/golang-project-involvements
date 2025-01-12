@@ -1,0 +1,51 @@
+name: Go CI
+
+# Trigger the workflow on push or pull request events to the main branch
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks to be executed
+    steps:
+      # Checks out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Sets up the Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.23" # Specify the Go version you want to use
+
+      # Caches Go modules to speed up workflow execution
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          # Caching the module cache
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      # Installs Go dependencies
+      - name: Install dependencies
+        run: go mod download
+
+      # Runs the tests
+      - name: Run Tests
+        run: go test ./... -v
+
+      # (Optional) Uploads test coverage to Codecov or similar services
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
